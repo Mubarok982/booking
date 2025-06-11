@@ -12,12 +12,43 @@ class Pengguna extends MY_Controller {
     }
 
     public function index() {
-        $data['user'] = $this->UserModel->getAll();
-        $this->render_backend('pengguna_list', $data);
+        $config['base_url'] = site_url('pengguna/index');
+        $config['total_row'] = $this->UserModel->count();
+        $config['per_page'] = 5;
+        $config['uri_segment'] = 3;
+
+        // Bootstrap Pagination Style
+        $config['full_tag_open'] = '<ul class="pagination">';
+        $config['full_tag_close'] = '</ul>';
+        $config['first_tag_open'] = '<li>';
+        $config['first_tag_close'] = '</li>';
+        $config['last_tag_open'] = '<li>';
+        $config['last_tag_close'] = '</li>';
+        $config['next_tag_open'] = '<li>';
+        $config['next_tag_close'] = '</li>';
+        $config['prev_tag_open'] = '<li>';
+        $config['prev_tag_close'] = '</li>';
+        $config['cur_tag_open'] = '<li class="active"><a>';
+        $config['cur_tag_close'] = '</a></li>';
+        $config['num_tag_open'] = '<li>';
+        $config['num_tag_close'] = '</li>';
+        
+        $this->pagination->initialize($config);
+        $page = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
+        $data['user'] = $this->UserModel->getpagination($config['per_page'], $page);
+        $this->render_backend('pengguna', $data);
     }
 
     public function tambah() {
-        if ($_POST) {
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('username', 'Username', 'required | is_unique[user.username]');
+        $this->form_validation->set_rules('password', 'Password', 'required | min_length[8]');
+        $this->form_validation->set_rules('nama', 'Nama', 'required');
+        $this->form_validation->set_rules('role', 'Role', 'required');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->render_backend('pengguna_form');
+        } else {
             $data = [
                 'username' => $this->input->post('username'),
                 'password' => md5($this->input->post('password')),
@@ -27,7 +58,6 @@ class Pengguna extends MY_Controller {
             $this->UserModel->insert($data);
             redirect('pengguna');
         }
-        $this->render_backend('pengguna_form');
     }
 
     public function edit($id) {

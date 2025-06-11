@@ -37,4 +37,12 @@ class UserModel extends CI_Model
         return $this->db->delete('user', ['id' => $id]);
     }
 
+    public function getPagination($limit, $start) {
+        return $this->db->get('user', $limit, $start)->result();
+    }
+
+    public function count() {
+        return $this->db->count_all('user');
+    }
+
 }

@@ -1,12 +1,11 @@
 <?php
-// Jika bukan role 'user', tampilkan tombol TAMBAH DATA
-if ($this->session->userdata('role') != 'user') {
+$role = $this->session->userdata('role');
+if ($role == 'admin'):
 ?>
 <div class="pull-right">
     <a href="<?= site_url('berita/tambah'); ?>" class="btn btn-success">TAMBAH DATA</a>
 </div>
-<?php } ?>
-
+<?php endif; ?>
 <h2 style="margin-top: 0;margin-bottom: 0;">Berita</h2>
 <div class="clearfix"></div>
 <hr />

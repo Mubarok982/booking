@@ -1,7 +1,3 @@
-<?php if($this->session->userdata('role') == 'admin'): ?>
-<li><a href="<?= site_url('pengguna') ?>">Pengguna</a></li>
-<?php endif; ?>
-
 <div class="container">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
@@ -25,7 +21,7 @@
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="<?= site_url('auth/logout'); ?>">Logout</a></li>
+            <li><a href="<?= site_url('auth/logout'); ?>">Logout</a></li> 
         </ul>
     </div><!--/.navbar-collapse -->
 </div>
