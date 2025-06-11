@@ -13,7 +13,7 @@ class Pengguna extends MY_Controller {
 
     public function index() {
         $config['base_url'] = site_url('pengguna/index');
-        $config['total_row'] = $this->UserModel->count();
+        $config['total_rows'] = $this->UserModel->count();
         $config['per_page'] = 5;
         $config['uri_segment'] = 3;
 
@@ -40,42 +40,61 @@ class Pengguna extends MY_Controller {
     }
 
     public function tambah() {
-        $this->load->library('form_validation');
-        $this->form_validation->set_rules('username', 'Username', 'required | is_unique[user.username]');
-        $this->form_validation->set_rules('password', 'Password', 'required | min_length[8]');
-        $this->form_validation->set_rules('nama', 'Nama', 'required');
-        $this->form_validation->set_rules('role', 'Role', 'required');
+    $this->form_validation->set_rules('username', 'Username', 'required|is_unique[user.username]');
+    $this->form_validation->set_rules('password', 'Password', 'required|min_length[4]');
+    $this->form_validation->set_rules('nama', 'Nama', 'required');
+    $this->form_validation->set_rules('role', 'Role', 'required');
 
-        if ($this->form_validation->run() === FALSE) {
-            $this->render_backend('pengguna_form');
-        } else {
-            $data = [
-                'username' => $this->input->post('username'),
-                'password' => md5($this->input->post('password')),
-                'nama'     => $this->input->post('nama'),
-                'role'     => $this->input->post('role')
-            ];
-            $this->UserModel->insert($data);
-            redirect('pengguna');
-        }
+    if ($this->form_validation->run() === FALSE) {
+        $this->render_backend('pengguna_form');
+    } else {
+        $data = [
+            'username' => $this->input->post('username'),
+            'password' => md5($this->input->post('password')),
+            'nama'     => $this->input->post('nama'),
+            'role'     => $this->input->post('role')
+        ];
+        $this->UserModel->insert($data);
+        redirect('pengguna');
     }
+}
+
 
     public function edit($id) {
-        $data['row'] = $this->UserModel->getById($id);
-        if ($_POST) {
-            $update = [
-                'username' => $this->input->post('username'),
-                'nama'     => $this->input->post('nama'),
-                'role'     => $this->input->post('role')
-            ];
-            if (!empty($this->input->post('password'))) {
-                $update['password'] = md5($this->input->post('password'));
-            }
-            $this->UserModel->update($id, $update);
-            redirect('pengguna');
-        }
-        $this->render_backend('pengguna_form', $data);
+    $data['row'] = $this->UserModel->getById($id);
+
+    $username_input = $this->input->post('username');
+    $username_lama = $data['row']->username;
+
+    // Jika username tidak berubah, jangan pakai is_unique
+    if ($username_input != $username_lama) {
+        $is_unique = '|is_unique[user.username]';
+    } else {
+        $is_unique = '';
     }
+
+    $this->form_validation->set_rules('username', 'Username', 'required' . $is_unique);
+    $this->form_validation->set_rules('nama', 'Nama', 'required');
+    $this->form_validation->set_rules('role', 'Role', 'required');
+
+    if ($this->form_validation->run() == FALSE) {
+        $this->render_backend('pengguna_form', $data);
+    } else {
+        $update = [
+            'username' => $username_input,
+            'nama'     => $this->input->post('nama'),
+            'role'     => $this->input->post('role')
+        ];
+
+        if (!empty($this->input->post('password'))) {
+            $update['password'] = md5($this->input->post('password'));
+        }
+
+        $this->UserModel->update($id, $update);
+        redirect('pengguna');
+    }
+}
+
 
     public function delete($id) {
         $this->UserModel->delete($id);

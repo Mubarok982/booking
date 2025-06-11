@@ -1,36 +1,70 @@
 <?php
-class Berita extends MY_Controller {
+class Berita extends MY_Controller
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->load->model('BeritaModel');
     }
 
-    public function index() {
-        $data['berita'] = $this->BeritaModel->getAll();
-        $this->render_backend('berita', $data);
+   public function index()
+{
+    $this->load->library('pagination');
+
+    $keyword = $this->input->get('q');
+    $start = $this->input->get('start') ?? 0;
+    $limit = 5;
+
+    $config = [
+    'page_query_string'      => TRUE,
+    'query_string_segment'   => 'start',
+    'use_page_numbers'       => FALSE, 
+    'per_page'               => $limit,
+    'full_tag_open'          => '<ul class="pagination">',
+    'full_tag_close'         => '</ul>',
+    'cur_tag_open'           => '<li class="active"><a>',
+    'cur_tag_close'          => '</a></li>',
+    'num_tag_open'           => '<li>',
+    'num_tag_close'          => '</li>',
+    'prev_tag_open'          => '<li>',
+    'prev_tag_close'         => '</li>',
+    'next_tag_open'          => '<li>',
+    'next_tag_close'         => '</li>',
+];
+
+
+    if (!empty($keyword)) {
+        $config['total_rows'] = $this->BeritaModel->countSearch($keyword);
+        $config['base_url'] = site_url('berita') . '?q=' . urlencode($keyword);
+        $berita = $this->BeritaModel->search($keyword, $limit, $start);
+    } else {
+        $config['total_rows'] = $this->BeritaModel->count();
+        $config['base_url'] = site_url('berita');
+        $berita = $this->BeritaModel->getPagination($limit, $start);
     }
 
-    public function tambah() {
-        if ($this->session->userdata('role') == 'user') show_404();
+    $this->pagination->initialize($config);
 
-        if ($_POST) {
-            $data = [
-                'judul' => $this->input->post('judul'),
-                'deskripsi' => $this->input->post('deskripsi'),
-                'tanggal' => date('Y-m-d')
-            ];
-            $this->BeritaModel->insert($data);
-            redirect('berita');
-        }
-        $this->render_backend('berita_form');
-    }
+    $data['berita'] = $berita;
+    $data['keyword'] = $keyword ?? '';
+    $this->render_backend('berita', $data);
+}
 
-    public function edit($id) {
-        if ($this->session->userdata('role') == 'user') show_404();
+    public function edit($id)
+    {
+        if ($this->session->userdata('role') == 'user')
+            show_404();
+
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('judul', 'Judul', 'required');
+        $this->form_validation->set_rules('deskripsi', 'Deskripsi', 'required');
 
         $data['row'] = $this->BeritaModel->getById($id);
-        if ($_POST) {
+
+        if ($this->form_validation->run() == FALSE) {
+            $this->render_backend('berita_form', $data);
+        } else {
             $update = [
                 'judul' => $this->input->post('judul'),
                 'deskripsi' => $this->input->post('deskripsi')
@@ -38,11 +72,13 @@ class Berita extends MY_Controller {
             $this->BeritaModel->update($id, $update);
             redirect('berita');
         }
-        $this->render_backend('berita_form', $data);
     }
 
-    public function delete($id) {
-        if ($this->session->userdata('role') == 'user') show_404();
+
+    public function delete($id)
+    {
+        if ($this->session->userdata('role') == 'user')
+            show_404();
         $this->BeritaModel->delete($id);
         redirect('berita');
     }

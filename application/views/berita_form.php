@@ -1,5 +1,10 @@
 <h2><?= isset($row) ? 'Edit' : 'Tambah'; ?> Berita</h2>
 <hr>
+<?php if (validation_errors()): ?>
+<div class="alert alert-danger">
+    <?= validation_errors(); ?>
+</div>
+<?php endif; ?>
 
 <form method="post">
     <div class="form-group">

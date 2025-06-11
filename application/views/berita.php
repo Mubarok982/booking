@@ -1,15 +1,27 @@
-<?php
-$role = $this->session->userdata('role');
-if ($role == 'admin'):
-?>
+<?php if ($this->session->userdata('role') == 'admin') : ?>
 <div class="pull-right">
     <a href="<?= site_url('berita/tambah'); ?>" class="btn btn-success">TAMBAH DATA</a>
 </div>
 <?php endif; ?>
-<h2 style="margin-top: 0;margin-bottom: 0;">Berita</h2>
-<div class="clearfix"></div>
-<hr />
 
+<h2>Berita</h2>
+<hr>
+
+<!-- Form Pencarian -->
+<form method="get" class="form-inline" action="<?= site_url('berita') ?>">
+    <div class="form-group">
+        <input type="text" name="q" class="form-control" placeholder="Cari berita..." value="<?= $keyword ?? '' ?>">
+    </div>
+    <button type="submit" class="btn btn-info">Cari</button>
+    <a href="<?= site_url('berita'); ?>" class="btn btn-default">Reset</a>
+</form>
+
+<!-- Info pencarian -->
+<?php if (!empty($keyword)) : ?>
+    <p><em>Hasil pencarian untuk: <strong><?= htmlspecialchars($keyword); ?></strong></em></p>
+<?php endif; ?>
+
+<!-- Tabel -->
 <div class="table-responsive">
     <table class="table table-bordered table-hover">
         <thead>
@@ -25,7 +37,7 @@ if ($role == 'admin'):
         </thead>
         <tbody>
             <?php if (!empty($berita)) :
-                $no = 1;
+                $no = 1 + ($this->input->get('start') ?? 0); // buat nomor tetap naik saat paging
                 foreach ($berita as $b) : ?>
                     <tr>
                         <td><?= $no++; ?></td>
@@ -53,4 +65,9 @@ if ($role == 'admin'):
             <?php endif; ?>
         </tbody>
     </table>
+</div>
+
+<!-- Pagination-->
+<div class="text-center">
+    <?= $this->pagination->create_links(); ?>
 </div>

@@ -4,7 +4,6 @@
 <br><br>
 
 <table class="table table-bordered">
-    <?= $this->pagination->create_links(); ?>
     <thead>
         <tr>
             <th>No</th>
@@ -29,3 +28,9 @@
         <?php endforeach; ?>
     </tbody>
 </table>
+
+<!-- Pagination -->
+<div class="text-center">
+  <?= $this->pagination->create_links(); ?>
+</div>
+

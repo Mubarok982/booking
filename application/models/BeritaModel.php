@@ -19,4 +19,29 @@ class BeritaModel extends CI_Model {
     public function delete($id) {
         return $this->db->delete('berita', ['id' => $id]);
     }
+
+    public function getPagination($limit, $start) {
+    return $this->db->get('berita', $limit, $start)->result();
+}
+
+public function count() {
+    return $this->db->count_all('berita');
+}
+
+public function search($keyword, $limit = null, $start = null) {
+    $this->db->from('berita');
+    $this->db->like('judul', $keyword);
+    $this->db->or_like('deskripsi', $keyword);
+    if ($limit !== null && $start !== null) {
+        $this->db->limit($limit, $start);
+    }
+    return $this->db->get()->result();
+}
+
+public function countSearch($keyword) {
+    $this->db->from('berita');
+    $this->db->like('judul', $keyword);
+    $this->db->or_like('deskripsi', $keyword);
+    return $this->db->count_all_results();
+}
 }
