@@ -82,4 +82,24 @@ class Berita extends MY_Controller
         $this->BeritaModel->delete($id);
         redirect('berita');
     }
+
+    public function tambah() {
+        if ($this->session->userdata('role') == 'user') show_404();
+
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('judul', 'Judul', 'required');
+        $this->form_validation->set_rules('deskripsi', 'Deskripsi', 'required');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->render_backend('berita_form');
+        } else {
+            $data = [
+                'judul' => $this->input->post('judul'),
+                'deskripsi' => $this->input->post('deskripsi'),
+                'tanggal' => date('Y-m-d')
+            ];
+            $this->BeritaModel->insert($data);
+            redirect('berita');
+        }
+    }
 }
