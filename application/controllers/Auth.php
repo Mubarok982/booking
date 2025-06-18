@@ -1,5 +1,6 @@
 <?php 
 defined('BASEPATH') OR exit('No direct script access allowed');
+
 class Auth extends MY_Controller {
 
     public function __construct() {
@@ -8,42 +9,46 @@ class Auth extends MY_Controller {
     }
 
     public function index() {
-        if($this->session->userdata('aauthenticated'))
+        // Jika sudah login, langsung ke dashboard
+        if($this->session->userdata('authenticated')) {
             redirect('page/home');
-         $this->load->view('login');
+        }
+
+        $this->load->view('login');
     }
 
-    public function login(){
-    $username = $this->input->post('username');
-    $password = md5($this->input->post('password'));
+    public function login() {
+        $username = $this->input->post('username');
+        $password = md5($this->input->post('password'));
 
-    echo "Username: $username<br>";
-    echo "Password MD5: $password<br>";
+        $user = $this->UserModel->get($username);
 
-    $user = $this->UserModel->get($username);
+        if (empty($user)) {
+            $this->session->set_flashdata('error', 'User tidak ditemukan.');
+            redirect('auth');
+        }
 
-    if(empty($user)) {
-        echo "User tidak ditemukan<br>";
-        return;
+        if ($password === $user->password) {
+            // ✅ Simpan semua informasi penting, termasuk id
+            $session = array(
+                'authenticated' => true,
+                'id'        => $user->id,         // 🔥 penting untuk relasi booking
+                'username'  => $user->username,
+                'nama'      => $user->nama,
+                'role'      => $user->role,
+                'foto'      => $user->foto 
+            );
+
+            $this->session->set_userdata($session);
+            // Log aktivitas
+            log_activity('Login berhasil');
+
+            redirect('page/home');
+        } else {
+            $this->session->set_flashdata('error', 'Password salah.');
+            redirect('auth');
+        }
     }
-
-    echo "User ditemukan! Password di DB: " . $user->password . "<br>";
-
-    if($password == $user->password){
-        $session = array(
-            'authenticated' => true,
-            'username' => $user->username,
-            'nama' => $user->nama,
-            'role' => $user->role
-        );
-        $this->session->set_userdata($session);
-        echo "Login berhasil. Redirect ke home...";
-        redirect('page/home');
-    } else {
-        echo "Password salah<br>";
-    }
-}
-
 
     public function logout() {
         $this->session->sess_destroy();

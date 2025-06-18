@@ -7,7 +7,7 @@
 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 <meta name="description" content="">
 <meta name="author" content="">
-<title>Login + Hak Akses (PHP)</title>
+<title>Booking App</title>
 <!-- Load File CSS Bootstrap -->
 <link href="<?php echo base_url('css/bootstrap.min.css'); ?>" rel="stylesheet">
 <link href="<?php echo base_url('css/bootstrap.min.css'); ?>" rel="stylesheet">
