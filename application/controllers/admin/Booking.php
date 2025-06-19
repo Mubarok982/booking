@@ -49,4 +49,17 @@ class Booking extends MY_Controller {
         $this->m_model->delete(['id' => $id], 'booking');
         redirect('admin/booking');
     }
+
+    public function setujui($id) {
+    $this->Booking_model->update_status($id, 'Diterima');
+    $this->session->set_flashdata('success', 'Booking disetujui.');
+    redirect('admin/booking');
+}
+
+public function tolak($id) {
+    $this->Booking_model->update_status($id, 'Ditolak');
+    $this->session->set_flashdata('success', 'Booking ditolak.');
+    redirect('admin/booking');
+}
+
 }

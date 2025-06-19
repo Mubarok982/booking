@@ -11,4 +11,17 @@ class Booking_model extends CI_Model {
         $this->db->order_by('booking.id', 'DESC');
         return $this->db->get()->result();
     }
+
+    public function getBookingPerBulan() {
+    $this->db->select("MONTH(tanggal) as bulan, COUNT(*) as total");
+    $this->db->group_by("MONTH(tanggal)");
+    $this->db->order_by("bulan", "ASC");
+    return $this->db->get("booking")->result();
+}
+public function update_status($id, $status) {
+    $this->db->where('id', $id);
+    return $this->db->update('booking', ['status' => $status]);
+}
+
+
 }

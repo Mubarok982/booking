@@ -65,4 +65,34 @@ class User extends MY_Controller {
         $this->User_model->delete($id);
         redirect('admin/user');
     }
+
+    public function form_import() {
+    $this->render_backend('admin/user/form_import');
+}
+
+public function import() {
+    include APPPATH . 'third_party/PHPExcel/IOFactory.php';
+
+    $file = $_FILES['fileExcel']['tmp_name'];
+
+    $objPHPExcel = PHPExcel_IOFactory::load($file);
+    $sheet = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+
+    foreach ($sheet as $i => $row) {
+        if ($i == 1) continue; // skip header
+
+        $data = [
+            'nama' => $row['A'],
+            'username' => $row['B'],
+            'password' => md5($row['C']),
+            'role' => $row['D'],
+            'terdaftar' => date('Y-m-d H:i:s')
+        ];
+        $this->UserModel->insert($data);
+    }
+
+    $this->session->set_flashdata('success', 'Import berhasil!');
+    redirect('admin/user');
+}
+
 }
