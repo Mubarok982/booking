@@ -60,3 +60,4 @@ $route['admin/aplikasi'] = 'admin/aplikasi/index';
 $route['admin/aplikasi/simpan'] = 'admin/aplikasi/simpan';
 $route['admin/booking/setujui/(:num)'] = 'admin/booking/setujui/$1';
 $route['admin/booking/tolak/(:num)']   = 'admin/booking/tolak/$1';
+$route['user/dashboard'] = 'user/dashboard';

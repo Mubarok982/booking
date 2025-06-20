@@ -14,8 +14,8 @@
     <?php endif; ?>
 
     <div class="table-responsive">
-        <table class="table table-bordered table-hover table-striped">
-            <thead class="thead-dark">
+        <table class="table table-bordered table-hover table-striped align-middle">
+            <thead class="table-dark">
                 <tr>
                     <th>No</th>
                     <th>User</th>
@@ -25,13 +25,12 @@
                     <th>Agenda</th>
                     <th>Status</th>
                     <?php if ($this->session->userdata('role') === 'Admin'): ?>
-                        <th width="160">Aksi</th>
+                        <th width="180">Aksi</th>
                     <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
-                <?php $no = 1;
-                foreach ($booking as $b): ?>
+                <?php $no = 1; foreach ($booking as $b): ?>
                     <tr>
                         <td><?= $no++ ?></td>
                         <td><?= $b->nama_user ?></td>
@@ -41,30 +40,37 @@
                         <td><?= $b->agenda ?></td>
                         <td>
                             <?php
-                            $badgeClass = $b->status === 'Diterima' ? 'badge-success'
-                                : ($b->status === 'Ditolak' ? 'badge-danger' : 'badge-warning');
+                                $status = strtolower($b->status);
+                                $badgeClass = match ($status) {
+                                    'diterima' => 'success',
+                                    'ditolak'  => 'danger',
+                                    'menunggu'=> 'warning',
+                                    default    => 'secondary'
+                                };
                             ?>
-                            <span class="badge <?= $badgeClass ?>"><?= $b->status ?></span>
+                            <span class="badge bg-<?= $badgeClass ?>"><?= ucfirst($status) ?></span>
                         </td>
 
                         <?php if ($this->session->userdata('role') === 'Admin'): ?>
                             <td>
-                                <?php if ($b->status === 'Menunggu'): ?>
-                                    <a href="<?= site_url('admin/booking/setujui/' . $b->id) ?>" 
-                                       class="btn btn-success btn-sm" title="Setujui">
-                                        <i class="fa fa-check-circle"></i>
+                                <div class="d-flex gap-1">
+                                    <?php if ($b->status === 'Menunggu'): ?>
+                                        <a href="<?= site_url('admin/booking/setujui/' . $b->id) ?>" 
+                                           class="btn btn-success btn-sm" title="Setujui">
+                                            <i class="fa fa-check"></i>
+                                        </a>
+                                        <a href="<?= site_url('admin/booking/tolak/' . $b->id) ?>" 
+                                           class="btn btn-warning btn-sm text-white" title="Tolak">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    
+                                    <a href="<?= site_url('admin/booking/hapus/' . $b->id) ?>" 
+                                       class="btn btn-danger btn-sm" title="Hapus"
+                                       onclick="return confirm('Yakin hapus booking ini?')">
+                                        <i class="fa fa-trash-alt"></i>
                                     </a>
-                                    <a href="<?= site_url('admin/booking/tolak/' . $b->id) ?>" 
-                                       class="btn btn-warning btn-sm" title="Tolak">
-                                        <i class="fa fa-times-circle"></i>
-                                    </a>
-                                <?php endif; ?>
-
-                                <a href="<?= site_url('admin/booking/hapus/' . $b->id) ?>" 
-                                   class="btn btn-danger btn-sm" title="Hapus"
-                                   onclick="return confirm('Yakin hapus booking ini?')">
-                                    <i class="fa fa-trash-alt"></i>
-                                </a>
+                                </div>
                             </td>
                         <?php endif; ?>
                     </tr>

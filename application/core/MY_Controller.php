@@ -20,17 +20,13 @@ class MY_Controller extends CI_Controller {
         $this->load->view('template/login/index', $data);
     }
 
-    public function render_backend($content, $data = NULL) {
-    $data['headernya'] = $this->load->view('template/backend/header', $data, TRUE);
-    
-    // Tambahkan ini untuk debug:
-    if (!file_exists(APPPATH . 'views/' . $content . '.php')) {
-        echo "<strong>ERROR:</strong> View '$content.php' tidak ditemukan di folder views.";
-        exit;
-    }
+   protected function render_backend($view, $data = []) {
+    $data['title'] = $data['title'] ?? 'Dashboard';
 
-    $data['contentnya'] = $this->load->view($content, $data, TRUE);
+    $data['contents'] = $this->load->view($view, $data, true);
     $this->load->view('template/backend/index', $data);
 }
+
+
 
 }
